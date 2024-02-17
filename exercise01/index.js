@@ -1,5 +1,3 @@
-const MAX_ATTEMPTS = 5;
-
 function guessNumber(randomNumber, maxAttempts) {
     for (let i = 0; i < maxAttempts; i++) {
         let guess = parseInt(prompt('Jaké číslo si myslím?'));
@@ -19,6 +17,8 @@ function guessNumber(randomNumber, maxAttempts) {
 }
 
 function main() {
+    const MAX_ATTEMPTS = 5;
+    
     let randomNumber = Math.floor((Math.random() * 10) + 1);
     console.log('Myslím si číslo.');
     
