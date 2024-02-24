@@ -17,7 +17,7 @@ const writeTargetText = (data, target) => {
         if (err) {
             console.error(err.message);
         } else {
-            console.log(`Text \"${data.toString()}\" byl zkopírován do souboru ${target}.`);
+            console.log(`Text \"${data}\" byl zkopírován do souboru ${target}.`);
         }
     });
 };
