@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tůdůčková appka</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<h1>Tůdůčková appka :)</h1>
+
+<p>
+    <%= flashMessage %>
+</p>
+
+<form method="post" action="/todos">
+    <input type="text" placeholder="Název tůdůčka" name="title">
+    <button type="submit">Přidat</button>
+</form>
+
+<h2>Moje tůdůčka</h2>
+
+<ul>
+    <%
+    for (const todo of todos) { %>
+        <li>
+            <a id="todo-title" href="/todos/<%= todo.id %>">
+                <%= todo.title %>
+            </a>
+            <form method="post" action="/todos/<%= todo.id %>?_method=PUT" style="margin-right: 5px">
+                <input type="hidden" name="done" value="<%= !todo.done %>">
+                <button type="submit">
+                    <%- todo.done ? '<span>&#x2705;</span>' : '<span>&#10060;</span>' %>
+                </button>
+            </form>
+            <form method="post" action="/todos/<%= todo.id %>?_method=DELETE">
+                <button type="submit">
+                    &#128465;
+                    <span id="todo-remove-text">Odstranit</span>
+                </button>
+            </form>
+        </li>
+    <% } %>
+</ul>
+
+</body>
+</html>

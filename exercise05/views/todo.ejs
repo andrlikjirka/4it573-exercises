@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tůdůčková appka</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<h1>Tůdůčková appka :)</h1>
+
+<p>
+    <%= flashMessage %>
+</p>
+
+<a href="/todos">Zpět na seznam tůdůček </a>
+
+<div id="todo-detail-title-status">
+    <h2><%= todo.title %></h2>
+    <form method="post" action="/todos/<%= todo.id %>?_method=PUT" style="margin-right: 5px">
+        <input type="hidden" name="done" value="<%= !todo.done%>">
+        <button type="submit">
+            <%- todo.done ? '<span>&#x2705;</span>' : '<span>&#10060;</span>' %>
+        </button>
+    </form>
+</div>
+
+<div id="todo-detail-delete">
+    <form method="post" action="/todos/<%= todo.id %>?_method=DELETE">
+        <button type="submit">
+            &#128465;
+            <span id="todo-remove-text">Odstranit</span>
+        </button>
+    </form>
+</div>
+
+<form action="/todos/<%= todo.id%>?_method=PUT" method="post">
+    <input type="text" placeholder="Nový název tůdůčka" name="title">
+    <button type="submit">Uložit</button>
+</form>
+
+</body>
+</html>

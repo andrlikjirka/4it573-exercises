@@ -1,0 +1,45 @@
+body {
+    text-align: center;
+}
+
+ul {
+    list-style: disc;
+}
+
+li {
+    margin-bottom: 5px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+#todo-title {
+    text-decoration: none;
+    font-size: large;
+    margin-right: 10px;
+}
+
+#todo-done {
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+#todo-remove {
+    text-decoration: none;
+}
+
+#todo-remove-text {
+    font-size: smaller
+}
+
+#todo-detail-title-status {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#todo-detail-delete {
+    margin-bottom: 20px;
+}
