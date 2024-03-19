@@ -1,10 +1,10 @@
 import express from 'express';
+import session from 'express-session';
+
 import method_override from 'method-override';
 
 const port = 3000;
 const app = express();
-
-let flashMessage;
 
 let todos = [
     {
@@ -24,6 +24,13 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 
+app.use(session({
+    secret: '4it573',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {secure: false}
+}));
+
 // zaujal mne problém posílání pouze GET a POST z html formů, a vyzkoušel jsem řešení pomocí nalezené knihovny, která dokáže přemapovat post na specifikovanou metodu (?_method) a dovoluje tak používat klasické CRUD metody
 app.use(method_override('_method'));
 
@@ -37,12 +44,11 @@ app.use((req, res, next) => {
     }
 });
 
-app.get('/todos', (req, res) => {
+app.get('/todos', (req, res, next) => {
     res.render('index', {
         todos: todos,
-        flashMessage
-    })
-    flashMessage = '';
+        flashMessage: req.session.flash ? req.session.flash.message : ''
+    });
 });
 
 app.post('/todos', (req, res) => {
@@ -52,37 +58,42 @@ app.post('/todos', (req, res) => {
         done: false
     };
     todos.push(todo);
-    flashMessage = `Tůdůčko \"${todo.title}\" přidáno.`;
+    req.session.flash = {message: `Tůdůčko \"${todo.title}\" přidáno.`};
     res.redirect('/');
 });
 
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', (req, res, next) => {
     const todo = todos.find(todo => {
         return todo.id === Number(req.params.id)
     });
+
+    if (!todo) return next();
+
     res.render('todo', {
         todo: todo,
-        flashMessage
-    })
+        flashMessage: req.session.flash ? req.session.flash.message : ''
+    });
 });
 
-app.put('/todos/:id', (req, res) => {
+app.put('/todos/:id', (req, res, next) => {
     let todo = todos.find(todo => {
         return todo.id === Number(req.params.id);
     });
 
+    if (!todo) return next();
+
     if (req.body.title !== undefined) {
         const oldTitle = todo.title;
         todo.title = req.body.title;
-        flashMessage = `Změněn název tůdůčka z ${oldTitle} na ${todo.title}`;
+        req.session.flash = {message: `Změněn název tůdůčka z ${oldTitle} na ${todo.title}`};
     }
 
     if (req.body.done !== undefined) {
         todo.done = !todo.done
-        flashMessage = `Změměn stav tůdůčka \"${todo.title}\" na ${todo.done ? 'hotovo' : 'nehotovo'}.`;
+        req.session.flash = {message: `Změměn stav tůdůčka \"${todo.title}\" na ${todo.done ? 'hotovo' : 'nehotovo'}.`};
     }
 
-    // přesměrování zpět na stránku, ze které požadavek na update přišel
+    // přesměrování zpět na stránku, ze které požadavek na update přišel, jednodušší varianta: res.redirect('back')
     const backlink = req.headers.referer;
     if (backlink) {
         res.redirect(backlink)
@@ -91,17 +102,24 @@ app.put('/todos/:id', (req, res) => {
     }
 });
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', (req, res, next) => {
     let todo = todos.find(todo => {
         return todo.id === Number(req.params.id)
     })
+
+    if (!todo) return next();
+
     todos = todos.filter(todo => {
         return todo.id !== Number(req.params.id);
     });
-
-    flashMessage = `Tůdůčko \"${todo.title}\" bylo odebráno.`;
+    req.session.flash = {message: `Tůdůčko \"${todo.title}\" bylo odebráno.`};
     res.redirect('/')
 })
+
+app.use((req, res, next) => {
+   res.status(404);
+   res.send('Tůdůčko nenalezeno :(');
+});
 
 app.use((err, req, res, next) => {
     res.status(500).send('Něco se nepovedlo :(');
