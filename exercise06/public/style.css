@@ -17,6 +17,14 @@ li {
     text-decoration: none;
     font-size: large;
     margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+#todo-priority {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
 }
 
 #todo-done {
@@ -41,5 +49,9 @@ li {
 }
 
 #todo-detail-delete {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+#todo-detail-priority {
+    margin-bottom: 15px;
 }

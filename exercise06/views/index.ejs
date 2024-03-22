@@ -13,11 +13,16 @@
 <h1>Tůdůčková appka :)</h1>
 
 <p>
-    <%= flashMessage %>
+    <%- flashMessage %>
 </p>
 
 <form method="post" action="/todos">
-    <input type="text" placeholder="Název tůdůčka" name="title">
+    <input type="text" placeholder="Název tůdůčka" name="title" required>
+    <select name="priority">
+        <option value="nízká">Nízká</option>
+        <option value="normální">Normální</option>
+        <option value="vysoká">Vysoká</option>
+    </select>
     <button type="submit">Přidat</button>
 </form>
 
@@ -30,6 +35,9 @@
             <a id="todo-title" href="/todos/<%= todo.id %>">
                 <%= todo.title %>
             </a>
+            <span id="todo-priority">
+                (<%= todo.priority %> priorita)
+            </span>
             <form method="post" action="/todos/<%= todo.id %>?_method=PUT" style="margin-right: 5px">
                 <input type="hidden" name="done" value="<%= !todo.done %>">
                 <button type="submit">

@@ -13,7 +13,7 @@
 <h1>Tůdůčková appka :)</h1>
 
 <p>
-    <%= flashMessage %>
+    <%- flashMessage %>
 </p>
 
 <a href="/todos">Zpět na seznam tůdůček </a>
@@ -28,6 +28,10 @@
     </form>
 </div>
 
+<div id="todo-detail-priority">
+        Priorita: <%= todo.priority %>
+</div>
+
 <div id="todo-detail-delete">
     <form method="post" action="/todos/<%= todo.id %>?_method=DELETE">
         <button type="submit">
@@ -37,8 +41,18 @@
     </form>
 </div>
 
+
 <form action="/todos/<%= todo.id%>?_method=PUT" method="post">
-    <input type="text" placeholder="Nový název tůdůčka" name="title">
+    <label> Název tůdůčka
+        <input type="text" placeholder="Nový název tůdůčka" name="title" value="<%= todo.title %>" required>
+    </label>
+    <label> Priorita
+        <select name="priority">
+            <option value="nízká" <% if (todo.priority === 'nízká') {%> selected <%}%> >Nízká</option>
+            <option value="normální" <% if (todo.priority === 'normální') {%> selected <%}%>>Normální</option>
+            <option value="vysoká" <% if (todo.priority === 'vysoká') {%> selected <%}%>>Vysoká</option>
+        </select>
+    </label>
     <button type="submit">Uložit</button>
 </form>
 

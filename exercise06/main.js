@@ -1,23 +1,13 @@
-import express from 'express';
+import express, {raw} from 'express';
 import session from 'express-session';
+import knex from "knex";
+import knexfile from "./knexfile.js";
 
 import method_override from 'method-override';
 
 const port = 3000;
 const app = express();
-
-let todos = [
-    {
-        id: 1,
-        title: 'Zajít na pivo',
-        done: false
-    },
-    {
-        id: 2,
-        title: 'Vrátit se z hospody',
-        done: false
-    }
-]
+const db = knex(knexfile)
 
 app.set('view engine', 'ejs');
 
@@ -44,28 +34,31 @@ app.use((req, res, next) => {
     }
 });
 
-app.get('/todos', (req, res, next) => {
+app.get('/todos', async (req, res, next) => {
+    const todos = await db('todos').select('*');
     res.render('index', {
         todos: todos,
         flashMessage: req.session.flash ? req.session.flash.message : ''
     });
 });
 
-app.post('/todos', (req, res) => {
+app.post('/todos', async (req, res, next) => {
     const todo = {
-        id: todos.length + 1,
         title: req.body.title,
-        done: false
+        done: false,
+        priority: req.body.priority
     };
-    todos.push(todo);
+    try {
+        await db('todos').insert(todo);
+    } catch (err) {
+        return next(err);
+    }
     req.session.flash = {message: `Tůdůčko \"${todo.title}\" přidáno.`};
     res.redirect('/');
 });
 
-app.get('/todos/:id', (req, res, next) => {
-    const todo = todos.find(todo => {
-        return todo.id === Number(req.params.id)
-    });
+app.get('/todos/:id', async (req, res, next) => {
+    const todo = await db('todos').select('*').where('id', req.params.id).first();
 
     if (!todo) return next();
 
@@ -75,43 +68,43 @@ app.get('/todos/:id', (req, res, next) => {
     });
 });
 
-app.put('/todos/:id', (req, res, next) => {
-    let todo = todos.find(todo => {
-        return todo.id === Number(req.params.id);
-    });
+app.put('/todos/:id', async (req, res, next) => {
+    let todo = await db('todos').select('*').where('id', req.params.id).first();
 
     if (!todo) return next();
 
-    if (req.body.title !== undefined) {
+    let flashMessage = '';
+
+    if (req.body.title !== undefined && todo.title !== req.body.title) {
         const oldTitle = todo.title;
-        todo.title = req.body.title;
-        req.session.flash = {message: `Změněn název tůdůčka z ${oldTitle} na ${todo.title}`};
+        await db('todos').update('title', req.body.title).where('id', todo.id);
+        flashMessage += `Změněn název tůdůčka z \"${oldTitle}\" na \"${req.body.title}\".<br>`;
     }
 
     if (req.body.done !== undefined) {
-        todo.done = !todo.done
-        req.session.flash = {message: `Změměn stav tůdůčka \"${todo.title}\" na ${todo.done ? 'hotovo' : 'nehotovo'}.`};
+        await db('todos').update('done', !todo.done).where('id', todo.id);
+        flashMessage += `Změměn stav tůdůčka \"${todo.title}\" na ${!todo.done ? 'hotovo' : 'nehotovo'}.<br>`;
     }
 
-    // přesměrování zpět na stránku, ze které požadavek na update přišel, jednodušší varianta: res.redirect('back')
-    const backlink = req.headers.referer;
-    if (backlink) {
-        res.redirect(backlink)
-    } else {
-        res.redirect('/');
+    if (req.body.priority !== undefined && todo.priority !== req.body.priority) {
+        await db('todos').update('priority', req.body.priority).where('id', todo.id);
+        flashMessage += `Změněna priorita tůdůčka \"${todo.title}\" na ${req.body.priority}.`;
     }
+
+    req.session.flash = {message: flashMessage};
+    res.redirect('back');
 });
 
-app.delete('/todos/:id', (req, res, next) => {
-    let todo = todos.find(todo => {
-        return todo.id === Number(req.params.id)
-    })
+app.delete('/todos/:id', async (req, res, next) => {
+    const todo = await db('todos').select('*').where('id', req.params.id).first();
 
     if (!todo) return next();
 
-    todos = todos.filter(todo => {
-        return todo.id !== Number(req.params.id);
-    });
+    try {
+        await db('todos').delete().where('id', todo.id);
+    } catch (err) {
+        return next(err);
+    }
     req.session.flash = {message: `Tůdůčko \"${todo.title}\" bylo odebráno.`};
     res.redirect('/')
 })
@@ -122,6 +115,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+    console.error(err);
     res.status(500).send('Něco se nepovedlo :(');
 });
 
