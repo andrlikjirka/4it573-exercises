@@ -1,8 +1,9 @@
-# Domácí úkol č.5.
+# Domácí úkol č.6.
 
 ## Zadání:
 
-Do vaší Todo aplikace (můžete vycházet i z mojí verze) vytvořte stránku s detailem jednoho todočka. Tato stránku se bude
-nacházet pod URL /todo/:id a na stránce bude vidět titulek todočka a zda je hotové či ne. Dále zde budou odkazy na změnu
-stavu todočka, odstránění todočka a formulář na změnu titulku todočka. Na tuto stránku se dostanete kliknutím na titulek
-todočka na hlavní stránce se seznamem všech todoček.
+Do vaší Todo aplikace přidejte novou migraci přidávající nový sloupeček do tabulky todos - například priority, enum (
+výčet možností) s možnostmi normal, low a high. Pozor, neupravujte stávající migraci. Jak pomocí migrace přidat novou
+položku do tabulky najde na konci ve scriptech o databázi. Zároveň tento nový sloupeček nějak zobrazte na seznamu
+todoček, na detailu todočka a umožňěte ho upravovat z detailu todočka (buďto pomocí nového formuláře nebo rozšiřte již
+existující formulář na úpravu titulku).
